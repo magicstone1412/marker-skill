@@ -14,7 +14,7 @@ Repo: [magicstone1412/ai-skill](https://github.com/magicstone1412/ai-skill) — 
 
 ### Agent install prompt
 
-⚠️ **For humans only:** A ready-to-copy version lives in [`docs/agent-prompt.md`](docs/agent-prompt.md) (kept out of this README on purpose, so it isn't picked up by tools that auto-fetch `README.md`). Open that file, copy its content, and paste it as your own message to any agent with bash access.
+⚠️ **For humans only:** A ready-to-copy version lives in [`docs/installation-agent-prompt.md`](docs/installation-agent-prompt.md) (kept out of this README on purpose, so it isn't picked up by tools that auto-fetch `README.md`). Open that file, copy its content, and paste it as your own message to any agent with bash access.
 
 ### Commands
 
