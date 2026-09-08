@@ -47,6 +47,7 @@ def parse_document(
     file_path: str | Path,
     output_format: str = "markdown",
     force_ocr: bool = False,
+    disable_ocr: bool = False,
     paginate_output: bool = False,
     page_range: str | None = None,
     api_url: str | None = None,
@@ -61,6 +62,9 @@ def parse_document(
         file_path: Path to the file to convert.
         output_format: One of 'markdown', 'json', 'html', 'chunks'.
         force_ocr: Force OCR on all pages.
+        disable_ocr: Pure text-layer extraction, no VLM/OCR at all (fastest,
+            no inference server needed). Best for born-digital PDFs.
+            Mutually exclusive with force_ocr.
         paginate_output: Insert page separators in the output.
         page_range: Comma-separated page range, e.g. '0,5-10,20'.
         api_url: Marker API URL (defaults to MARKER_API_URL env var).
@@ -70,6 +74,9 @@ def parse_document(
     Returns:
         Parsed JSON response from the API.
     """
+    if force_ocr and disable_ocr:
+        raise ValueError("force_ocr and disable_ocr are mutually exclusive.")
+
     url = (api_url or _require_env("MARKER_API_URL")).rstrip("/") + "/marker/upload"
     key = api_key or os.getenv("MARKER_API_KEY", "")
 
@@ -94,6 +101,7 @@ def parse_document(
     data = {
         "output_format": output_format,
         "force_ocr": str(force_ocr).lower(),
+        "disable_ocr": str(disable_ocr).lower(),
         "paginate_output": str(paginate_output).lower(),
     }
     if page_range:
@@ -132,6 +140,13 @@ def main() -> int:
         help="Force OCR on all pages",
     )
     parser.add_argument(
+        "--disable-ocr",
+        action="store_true",
+        help="Pure text-layer extraction, no VLM/OCR at all (no inference "
+        "server needed). Use for born-digital PDFs. Mutually exclusive "
+        "with --force-ocr.",
+    )
+    parser.add_argument(
         "--paginate",
         action="store_true",
         help="Paginate output",
@@ -155,6 +170,7 @@ def main() -> int:
             file_path=args.file,
             output_format=args.format,
             force_ocr=args.force_ocr,
+            disable_ocr=args.disable_ocr,
             paginate_output=args.paginate,
             page_range=args.page_range,
             timeout=args.timeout,

@@ -45,11 +45,19 @@ Options:
 ```bash
 {baseDir}/.venv/bin/python {baseDir}/scripts/marker_client.py /path/to/file.pdf \
   --format markdown \
-  --force-ocr \
+  --disable-ocr \
   --paginate \
   --page-range 0,5-10,20 \
   --timeout 300
 ```
+
+## Choosing OCR behavior
+
+| Flag | When to use |
+|------|-------------|
+| *(neither flag)* | Default. Marker reads the text layer and selectively invokes OCR/VLM only on pages/blocks it flags as bad. **Still needs an inference server (`llama-server` on CPU)** for equation handling and bad-block repair, even on born-digital PDFs. |
+| `--disable-ocr` | Pure text-layer extraction. Never touches OCR/VLM, no inference server needed at all. **Use this for born-digital PDFs / ebooks where you don't want OCR** — fastest, most predictable, works even if `llama-server` isn't installed in the container. |
+| `--force-ocr` | Re-OCR every page regardless of text layer quality. Use for scanned documents. Mutually exclusive with `--disable-ocr`. |
 
 Output is printed to stdout as JSON:
 
