@@ -4,7 +4,7 @@ This file is a copy-paste template for a human to send as their own message to a
 
 ```
 Cài skill marker-pdf cho Pi agent theo đúng hướng dẫn tại:
-https://github.com/magicstone1412/ai-skill/blob/main/README.md
+https://github.com/magicstone1412/ai-skill/blob/main/marker-pdf/README.md
 
 Yêu cầu:
 1. Đọc file README.md ở repo trên, chạy tuần tự toàn bộ các lệnh trong mục "Install".
