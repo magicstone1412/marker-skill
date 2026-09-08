@@ -16,25 +16,34 @@ Convert PDFs, images, or office documents to Markdown/JSON/HTML using a self-hos
 
 ## Prerequisites
 
-A self-hosted Marker API must be running (see the marker repo's `docker-compose.yml`). Set these environment variables before use:
+A self-hosted Marker API must be running (see the marker repo's `docker-compose.yml`). Config lives in `{baseDir}/.env`, not shell environment variables (non-interactive agent shells don't source `~/.bashrc`, so exported vars don't persist between commands). Create it once during setup:
 
 ```bash
-export MARKER_API_URL=http://localhost:8001
-export MARKER_API_KEY=your-api-key   # omit or leave empty if auth is disabled
+cp {baseDir}/.env.example {baseDir}/.env
+```
+
+Defaults to `MARKER_API_URL=http://localhost:8001` with no API key. Edit `{baseDir}/.env` directly if your server URL differs or has auth enabled.
+
+## Setup (once)
+
+```bash
+cd {baseDir}
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
 ```
 
 ## How to Use
 
-Run the client script from this skill's directory:
+Always call the client script through the skill's own venv interpreter — do not use system `python3`:
 
 ```bash
-python3 {baseDir}/scripts/marker_client.py /path/to/file.pdf --format markdown
+{baseDir}/.venv/bin/python {baseDir}/scripts/marker_client.py /path/to/file.pdf --format markdown
 ```
 
 Options:
 
 ```bash
-python3 {baseDir}/scripts/marker_client.py /path/to/file.pdf \
+{baseDir}/.venv/bin/python {baseDir}/scripts/marker_client.py /path/to/file.pdf \
   --format markdown \
   --force-ocr \
   --paginate \

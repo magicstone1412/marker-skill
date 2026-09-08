@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """
-Hermes Marker Skill - Python client for self-hosted Marker API.
+Marker PDF Skill - Python client for self-hosted Marker API.
 
-Environment variables:
-    MARKER_API_URL  - Base URL of the Marker API (no trailing slash)
-    MARKER_API_KEY  - API key for authentication
+Config is read from (in order of precedence):
+    1. Explicit function/CLI arguments
+    2. Real environment variables (MARKER_API_URL, MARKER_API_KEY)
+    3. A .env file next to this script's skill directory
+
+Using .env avoids relying on the shell having sourced ~/.bashrc —
+non-interactive shells (the kind agents typically run commands in)
+do not source ~/.bashrc by default.
 """
 
 from __future__ import annotations
@@ -17,6 +22,13 @@ from pathlib import Path
 from typing import Any
 
 import requests
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    pass
 
 DEFAULT_TIMEOUT = 300
 

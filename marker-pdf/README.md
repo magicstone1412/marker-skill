@@ -9,6 +9,8 @@ Repo: [magicstone1412/ai-skill](https://github.com/magicstone1412/ai-skill) — 
 ## Install
 
 > **For an AI agent installing this skill:** run every command in this section in order, top to bottom, without skipping steps. Stop and report the error if any command exits non-zero. Do not invent an API key — auth is disabled by default (see Configuration).
+>
+> **Do not use `~/.bashrc` / `export` for config.** Agents typically run each command in a fresh non-interactive shell, which does not source `~/.bashrc` — a variable exported in one command will not exist in the next. This skill reads its config from a `.env` file instead, which works the same regardless of shell session.
 
 ### Agent install prompt
 
@@ -32,10 +34,11 @@ cd ~/.pi/agent/skills/marker-pdf
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 
-# 5. Point the skill at your self-hosted Marker API (no API key by default)
-echo 'export MARKER_API_URL=http://localhost:8001' >> ~/.bashrc
-source ~/.bashrc
+# 5. Create the config file from the template (no API key by default)
+cp .env.example .env
 ```
+
+`.env` already defaults to `MARKER_API_URL=http://localhost:8001` with `MARKER_API_KEY` commented out (no auth). Only edit `.env` if your server runs on a different URL or has auth enabled — see Configuration.
 
 **Project-local install** (scoped to one project instead of global) — replace step 2 with:
 ```bash
@@ -47,29 +50,30 @@ cp -r /tmp/ai-skill/marker-pdf .pi/skills/marker-pdf
 
 ## Verify (manual checklist)
 
-Run each check and confirm the expected result before considering the install done.
+Run each check and confirm the expected result before considering the install done. Every command below is self-contained — none of them depend on shell state from a previous command, so they're safe to run in separate sessions.
 
 - [ ] **Skill directory exists**
   ```bash
   ls ~/.pi/agent/skills/marker-pdf
   ```
-  Expected: `SKILL.md`, `scripts/`, `requirements.txt`, `.venv/`
+  Expected: `SKILL.md`, `scripts/`, `requirements.txt`, `.env`, `.venv/`
 
 - [ ] **venv has dependencies installed**
   ```bash
-  ~/.pi/agent/skills/marker-pdf/.venv/bin/pip list | grep requests
+  ~/.pi/agent/skills/marker-pdf/.venv/bin/pip list | grep -E "requests|dotenv"
   ```
-  Expected: `requests` listed
+  Expected: both `requests` and `python-dotenv` listed
 
-- [ ] **`MARKER_API_URL` is set**
+- [ ] **`.env` exists and has `MARKER_API_URL` set**
   ```bash
-  echo $MARKER_API_URL
+  cat ~/.pi/agent/skills/marker-pdf/.env
   ```
-  Expected: `http://localhost:8001` (or your server's URL)
+  Expected: a line like `MARKER_API_URL=http://localhost:8001`
 
-- [ ] **Marker API server is reachable**
+- [ ] **Marker API server is reachable** (reads the URL straight from `.env`, no shell env needed)
   ```bash
-  curl -sf "$MARKER_API_URL/health" && echo OK
+  URL=$(grep MARKER_API_URL ~/.pi/agent/skills/marker-pdf/.env | cut -d= -f2)
+  curl -sf "$URL/health" && echo OK
   ```
   Expected: `OK` printed, no connection error
 
@@ -79,7 +83,7 @@ Run each check and confirm the expected result before considering the install do
     ~/.pi/agent/skills/marker-pdf/scripts/marker_client.py \
     /path/to/sample.pdf --format markdown
   ```
-  Expected: JSON output with `"success": true`
+  Expected: JSON output with `"success": true`. The script loads `.env` itself — no need to export anything first.
 
 - [ ] **Pi discovers the skill**
   ```bash
@@ -97,22 +101,21 @@ If every box above checks out, the skill is correctly installed.
 
 ## Configuration
 
+Config lives in `marker-pdf/.env` (copied from `.env.example` during install), not in shell environment variables. The client script (`scripts/marker_client.py`) loads it automatically via `python-dotenv`.
+
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MARKER_API_URL` | yes | — | Base URL of your self-hosted Marker API, e.g. `http://localhost:8001` |
-| `MARKER_API_KEY` | no | *(unset)* | Only needed if your Marker server has auth enabled. **This skill assumes no API key by default** — do not set it unless you explicitly enabled `MARKER_API_KEY` on the server side. |
+| `MARKER_API_URL` | yes | `http://localhost:8001` | Base URL of your self-hosted Marker API |
+| `MARKER_API_KEY` | no | *(commented out)* | Only needed if your Marker server has auth enabled. **This skill assumes no API key by default** — leave it commented out unless you explicitly enabled `MARKER_API_KEY` on the server side. |
 
-Set `MARKER_API_URL` persistently in your shell profile so it survives new sessions:
+To change a value:
 ```bash
-echo 'export MARKER_API_URL=http://localhost:8001' >> ~/.bashrc
-source ~/.bashrc
+nano ~/.pi/agent/skills/marker-pdf/.env
 ```
 
-If you did enable auth on the server, add the key the same way:
-```bash
-echo 'export MARKER_API_KEY=your-api-key' >> ~/.bashrc
-source ~/.bashrc
-```
+If the agent (not Marker) runs inside its own container separate from where Marker's Docker container runs, `localhost` in `.env` won't reach it — use the Docker Compose service name (e.g. `http://marker-api:8001`) or the host's real IP instead.
+
+Real shell environment variables (`MARKER_API_URL`, `MARKER_API_KEY` exported in the current shell) still take precedence over `.env` if both are set — useful for one-off overrides.
 
 ---
 
@@ -147,4 +150,4 @@ rm -rf ~/.pi/agent/skills/marker-pdf
 rm -rf .pi/skills/marker-pdf
 ```
 
-Also remove the `MARKER_API_URL` / `MARKER_API_KEY` lines from `~/.bashrc` if no longer needed.
+No shell profile cleanup needed — all config lived in the skill's own `.env` file, which is removed along with the skill directory.
