@@ -9,7 +9,7 @@ Cài skill marker-pdf cho Pi agent. Làm đúng theo thứ tự sau, không tự
    ls ~/.pi/agent/skills/marker-pdf/SKILL.md 2>/dev/null && echo "Đã cài rồi, dừng ở đây" && exit 0
 
 1. Clone repo vào thư mục TẠM (không phải nơi cài đặt cuối cùng):
-   git clone https://github.com/magicstone1412/ai-skill.git /tmp/ai-skill-install
+   git clone https://github.com/magicstone1412/marker-skill.git /tmp/ai-skill-install
 
 2. Copy ĐÚNG thư mục con marker-pdf/ vào nơi Pi discover skill —
    đây là bước bắt buộc, không được bỏ qua hay chạy trực tiếp từ /tmp:

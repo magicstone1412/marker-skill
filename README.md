@@ -2,7 +2,7 @@
 
 A [Pi coding agent](https://pi.dev) skill that converts PDFs, images, and office documents (DOCX, PPTX, XLSX, EPUB, HTML) to Markdown/JSON/HTML using a self-hosted [Marker](https://github.com/datalab-to/marker) API.
 
-Repo: [magicstone1412/ai-skill](https://github.com/magicstone1412/ai-skill) — skill lives in `marker-pdf/`.
+Repo: [magicstone1412/marker-skill](https://github.com/magicstone1412/marker-skill) — skill lives in `marker-pdf/`.
 
 ---
 
@@ -20,7 +20,7 @@ Repo: [magicstone1412/ai-skill](https://github.com/magicstone1412/ai-skill) — 
 
 ```bash
 # 1. Clone the repo to a temp location
-git clone https://github.com/magicstone1412/ai-skill.git /tmp/ai-skill
+git clone https://github.com/magicstone1412/marker-skill.git /tmp/ai-skill
 
 # 2. Copy the skill into Pi's global skills directory
 mkdir -p ~/.pi/agent/skills
