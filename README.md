@@ -4,6 +4,8 @@ A [Pi coding agent](https://pi.dev) skill that converts PDFs, images, and office
 
 Repo: [magicstone1412/marker-skill](https://github.com/magicstone1412/marker-skill) — skill lives in `marker-pdf/`.
 
+The Marker API server this skill calls lives in [magicstone1412/marker](https://github.com/magicstone1412/marker).
+
 ---
 
 ## Install
